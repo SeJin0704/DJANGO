@@ -1,0 +1,138 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../static/base.css"> -->
+    {# common/base.html을 상속받겠음 #}
+    {% extends 'common/base.html' %}
+    {% block title %}[게시판]{% endblock title %}
+
+    {% block body %}
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js" integrity="sha256-oP6HI9z1XaZNBrJURtCoUT5SUnxFr8s3BzRl+cbzUq8=" crossorigin="anonymous"></script>
+    <script>
+        $(document).ready(function(){
+            // alert("반갑읍니다~^_^");
+        });
+        function callFunction(){
+            let data = { 'txt' : 'hello'};
+            //AJAX로 서버와 통신을 할때에도 csrf토큰은 있어야 한다.
+            $.ajax({
+                url: '/board/callAjax/',
+                type: 'post',
+                headers: {'X-CSRFTOKEN': '{{csrf_token}}'},
+                data: JSON.stringify(data), //js객체를 문자열화
+                success: function(res){
+                    console.log(res);
+                    console.log(res.result); // res 객체에 들어있는 result라는 필드
+                    console.log('성공했읍니다.');
+                }
+            })
+        }
+    </script>
+    <h1>게시판</h1>
+    {% if page_obj %}
+      <table border="1">
+
+        <tr>
+            <th>글번호</th>
+            <th>제목</th>
+            <th>글쓴이</th>
+            <th>날짜</th>
+            <th>조회수</th>
+        </tr>
+    {% for board in page_obj %}
+    <tr>
+        <td>{{ board.id }}</td>
+        <!-- 파라미터가 있는 주소를 호출할 떄 -->
+        <td><a href="{% url 'board:detail' board.id %}">{{ board.title }}</a></td>
+        <td>{{ board.author }}</td>
+        <td>{{ board.input_date }}</td>
+        <td style="text-align: center;">{{ board.view_count}}회  </td>
+    </tr>
+    {% endfor %}
+    </table>
+    {% else %}
+    <table border="1">
+            <tr>
+                <th colspan="5">
+                    게시글이 존재하지 않읍니다.
+                </th>
+            </tr>
+    </table>
+    {% endif %}
+       
+      
+    </table>
+    <!-- action을 비워놓게 되면 현재페이지의 주소를 다시 호출한다 -->
+    <form action="">
+        <select name="searchType" >
+            {% if searchType == 'title' %}
+                <option value="title" selected = "selected">제목</option>
+            {% else%}
+                <option value="title">제목</option>
+            {% endif %}
+
+            {% if searchType == 'writer' %}
+                <option value="writer" selected = "selected">글쓴이</option>
+            {% else%}
+                <option value="writer">글쓴이</option>
+            {% endif %}
+
+            {% if searchType == 'context' %}
+                <option value="context" selected = "selected">내용</option>
+            {% else%}
+                <option value="context">내용</option>
+            {% endif %}
+<!-- 
+            <option value="title">제목</option>
+            <option value="writer">글쓴이</option>
+            <option value="context">내용</option> -->
+        </select>
+        <input type="text" name="searchWord" value = "{{searchWord}}">
+        <input type="submit" value="검색">
+    </form>
+    <!-- 페이징 -->
+    {% if page_obj.has_previous %}
+        <a href="?page=1">&laquo;처음페이지로</a>
+        <a href="?page={{ page_obj.previous_page_number }}">이전 페이지로</a>
+    {% endif %}
+    <!-- pagenator의 number 현재 페이지 번호 -->
+    <!-- num_pagers 는 전체 페이지 수 -->
+    page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+
+    {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number}}">다음페이지로</a>
+        <a href="?page={{ page_obj.paginator.num_pages }}">마지막 페이지로&raquo;</a>
+    {% endif %}
+    <br>
+<!-- 페이징 2 : 가지고 있는 페이지의 번호 다 보여주기 -->
+    {% for page_number in page_obj.paginator.page_range %}
+    <a href="?page={{ page_number }}">{{ page_number }}</a>
+         &nbsp;
+    {% endfor %}
+    <br>
+<!-- 페이징3 : 2를 개선한 버전 -->
+    {% for page_number in page_obj.paginator.page_range %}
+    {% if page_number >= page_obj.number|add:-5 and page_number <= page_obj.number|add:5 %}
+        {% if searchWord %}
+            <a href ="?page={{ page_number }}&searchType={{ searchType }}&searchWord={{ searchWord }}">{{ page_number }}</a>
+            
+        {% else %}
+            <a href ="?page={{ page_number }}">{{page_number}}</a>
+        {% endif %}
+    {% endif %}
+    {% endfor %}
+
+    {% if user.is_authenticated %}
+        
+    <hr>
+    <a href="{% url 'board:write' %}">글쓰기</a>
+    {% endif %}
+    <input type="button" value="눌러보세요" onclick="callFunction()"><br>
+    <a href="http://127.0.0.1:8000/board/">첫 페이지로</a>
+    
+
+
+{% endblock body %}

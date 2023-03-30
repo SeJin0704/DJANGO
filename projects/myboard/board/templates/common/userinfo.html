@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script>
+        function confirmDelete(){
+            if (confirm("정말로 삭제 하시겠읍니까?")) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+    </script>
+    <title>회원정보보기</title>
+</head>
+<body>
+    
+    <form>
+        {% csrf_token %}
+        <table border="1">
+            <tr>
+                <th>아이디</th>
+                <td>{{ user.username }}</td>
+            </tr>
+            <tr>
+                <th>이름(성)</th>
+                <td>{{ user.last_name}}</td>
+            </tr>
+            <tr>
+                <th>이름</th>
+                <td>{{ user.first_name}}</td>
+            </tr>
+            <tr>
+                <th>이메일</th>
+                <td>{{ user.email }}</td>
+            </tr>
+        </table>
+        <hr>
+        <a href="{% url 'common:update' %}">회원정보수정</a>//
+        <a href="{% url 'common:delete' %}" onclick="return confirmDelete()"> 회원삭제</a>
+    </form>
+</body>
+</html>

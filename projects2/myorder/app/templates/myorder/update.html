@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>주문 수정</title>
+</head>
+<body>
+    <h2 style="background-color: aqua; width: 300px;" >주문 수정하기</h2>
+    <form action="../update/" method="post">
+        {% csrf_token %}
+        <table>
+            <tr>
+                <th>주문할 음식</th>
+                <td><input type="text" name="order_text"></td>
+            </tr>
+            <tr>
+                <th>가격</th>
+                <td><input type="text" name="price"></td>
+            </tr>
+            <tr>
+                <th>주소</th>ㄴ
+                <td><input type="text" name="address"></td>
+            </tr>
+            <tr>
+                
+            </tr>
+        </table>
+        <span><input type="submit" value="수정"></span>
+    </form>
+    <hr>
+    <a href="http://127.0.0.1:8000/index/">취소하고 홈으로</a>
+</body>
+</html>

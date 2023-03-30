@@ -1,0 +1,164 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> -->
+    {% extends 'common/base.html' %}
+    {% block title %}게시글{% endblock title %}
+    {% block body %}
+    <!-- <form action="../../update_friend/{{ board.id }}/" method="get">
+        {% csrf_token %}
+        이름<input type="text" name="friend_name" value="{{ friend.friend_name }}"><br>
+        나이<input type="text" name="friend_age" value="{{ friend.friend_age }}"><br>
+        친구소개<textarea cols="50" rows="3" name="friend_bigo">{{ friend.friend_bigo }}</textarea><br>
+        <input type="submit" value="수정">
+    </form> -->
+    
+    <script>
+      function confirmDelete(){
+          if (confirm("정말로 삭제 하시겠읍니까?")) {
+              return true;
+          } else {
+              return false;
+          }
+      }
+
+      function showUpdateForm(param){
+        // .../board/0/update_reply?rid=0
+        location.href = 'update_reply?rid='+param;
+      }
+      $(document).ready(function(){
+          loadReplyList();
+      })
+      function loadReplyList(){
+        let bNum = '{{ board.id }}';
+        
+        console.log(bNum);
+        $.ajax({
+          url:'/board/load_reply/',
+          type:'post',
+          headers: {'X-CSRFTOKEN': '{{csrf_token}}'},
+          data: {'id' : bNum },
+          success: function(response){
+            console.log(JSON.parse(response["response"]));
+
+            let replyList = JSON.parse(response["response"])
+            let str = "";
+            $.each(replyList, function(i, item){
+              let replyContent = item.fields.reply_content;
+              // $("#replyList).append(replyContent + "<br>")");
+
+            
+              str += '<span style="color: rgb(0, 252, 17);">[댓글]: </span>' + replyContent + '&nbsp;&nbsp;&nbsp;';
+              str += '<a href="#" onclick="showUpdateForm(' + item.pk + ')">수정 </a>';
+              str += `<a href="#" onclick="delete_reply(` + item.pk + `)">/ 삭쫴</a>`;
+              str += '<br>';
+                
+            }); 
+            $("#replyList").html(str);
+          }})}
+
+                
+  
+      function delete_reply(rid){
+        let bNum = '{{ board.id }}';
+        alert(rid)
+       
+        $.ajax({
+          url: '/board/' + bNum + '/delete_reply/' + rid + '/',
+          type:'post',
+          headers:{'X-CSRFTOKEN': '{{csrf_token}}'},
+          success: function(response){
+            console.log('댓글이 삭제되었읍니다 ^_^')
+            loadReplyList();
+          }
+      })
+    }
+        
+      // function update_reply(){
+      //   let bNum = '{{ board.id }}'
+      //   $.ajax({
+      //     url:/update_reply/,
+      //     type:'post',
+      //     headers:{'X-CSRFTOKEN': '{{csrf_token}}'},
+      //     data:{'id' : bNum },
+      //     success:
+      //   })
+      // }
+  </script>
+        <table border="1">
+        <tr>
+            <th>글번호</th>
+          <th>제목</th>
+          <th>글쓴이</th>
+          <th>날짜</th>
+          <th>조회수</th>
+        </tr>
+        
+          <tr>
+            <td>{{ board.id }}</td>
+            <td>{{ board.title }}</td>
+            <td>{{ board.writer }}</td>
+            <td>{{ board.input_date }}</td>
+            <td style="text-align: center;">{{ board.view_count}}회 </td>
+    
+          </tr>
+        
+          <tr>
+            <td colspan="5" style="text-align: center; font-weight: bold;" >게시글 내용</td>
+          </tr>
+          <tr>
+            <td height="500" colspan="5" style="vertical-align: top;" >{{ board.context }}</td>
+          </tr>
+    </table>
+    <!-- 수정 / 삭제 -->
+    <!-- {{ board.author }}
+    {{ user.username }} -->
+    <!-- username 끼리 비교하려면 -->
+    {% if board.author.username == user.username %}
+    <a href="{% url 'board:update' board.id %}">수정</a>&nbsp;&nbsp;
+    <a href="{% url 'board:delete' board.id %}"onclick="return confirmDelete()">삭제</a>
+    {% endif %}
+
+    <div id = "replyArea">
+      <!-- 댓글 목록 표시할 곳 -->
+      <div id = "replyList">
+        <!-- board 객체 뿐만 아니라 board와 FK로 엮인 객체는 -->
+        <!-- board.모델이름_set으로 가져올 수 있다 -->
+        <!-- {% if board.reply_set %}
+           {% for reply in board.reply_set.all %}
+            <span style="color: rgb(0, 252, 17);">[댓글]: </span>{{ reply }}&nbsp;&nbsp;&nbsp;
+            <a href="#" onclick="javascript:showUpdateForm('{{reply.id}}')">수정</a>
+            <a href="{% url 'board:delete_reply' id=board.id rid=reply.id %}">삭제</a>
+            <br>
+          {% endfor %}
+        {% else %}
+          <p>등록된 댓글이 없읍니다.</p>
+        {% endif %} -->
+        <hr>
+      </div>
+      <!-- 댓글입력 폼 -->
+      <!--context에 update에 대한 값을 찾지 못했을 때 -->
+      <div id = "replyForm">
+        
+        {% if not update %}   
+        <form action="{% url 'board:write_reply' board.id %}" method="post">
+          {% csrf_token %}
+          <textarea name="replyText" cols="30" rows="2"></textarea>
+          <input type="submit" value="댓글쓰기">
+        </form>
+        {% else %}
+        <form action="{% url 'board:update_reply' board.id %}" method="post">
+          {% csrf_token %}
+          <input type="hidden" name="rid" value="{{reply.id}}">
+          <textarea name="replyText" cols="30" rows="2">{{ reply.reply_content }}</textarea>
+          <input type="submit" value="댓글수정">
+        </form>
+        {% endif %}
+      </div>
+    </div>
+    <!-- board.author는 user하고 비교한다 -->
+    <hr>
+<a href="http://127.0.0.1:8000/board/">게시글 목록</a>
+{% endblock body %}

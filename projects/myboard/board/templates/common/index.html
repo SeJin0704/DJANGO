@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script>
+        function confirmDelete(){
+            if (confirm("정말로 삭제 하시겠읍니까?")) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+        
+    </script>
+</head>
+<body>
+    <h1>안녕하세요</h1>
+<!-- django에서 제공하는 User모델 -->
+    <h2>hello1 
+        {% if user.is_authenticated %}   <!--user 정보가 있으면 username 표시-->
+        <span style="color: rgb(34, 0, 255); font-style: italic;" >
+            {{user.username }}
+        </span>님 반갑읍니다!
+        {% else %}   <!--없으면 그냥 게스트 표시-->
+        GUEST
+        {% endif %}
+    </h2>
+
+    <ul>
+        {% if not user.is_authenticated %}
+            <li><a href="{% url 'common:signup' %}">회원가입</a></li>
+        <li><a href="{% url 'common:login' %}">로그인</a></li>
+        {% elif user.is_authenticated %}
+            <li><a href="{% url 'common:logout' %}"> 로그아웃</a></li>
+            <li><a href="{% url 'common:delete' %}" onclick="return confirmDelete()"> 회원삭제</a></li>
+            <li><a href="{% url 'common:userinfo' %}">회원정보조회</a></li>
+        {% endif %}
+        <li><a href="{% url 'board:index' %}"> 게시판으로 가기</a></li>
+    </ul>
+    
+</body>
+</html>

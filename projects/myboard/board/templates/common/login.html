@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>로그인</title>
+</head>
+<body>
+    <h2>로그인하기</h2>
+    <form action="{% url 'common:login' %}" method="post">
+        {% csrf_token %}
+        <!-- 로그인성공후 이동할 url -->
+
+        <!-- hidden태그 next의 value로 next를 사용하면 주소의 쿼리스트링에 있던 ?next=주소로 이동/ value로 특정 문자열을 사용하면 해당하는 주소로 이동 -->
+        <input type="hidden" name="next" value="{{ next }}">
+        <!-- 아이디와 비밀번호를 입력받는 폼 -->
+        
+        <table>
+            <tr>
+           <td> 아이디: <input type="text" name = "username"></td>
+            </tr>
+            <tr>
+           <td>비밀번호: <input type="password" name = "password"></td>
+            </tr>
+        </table>
+           <input type="submit" value="로그인">
+        <!-- 로그인버튼 -->
+        
+    </form>
+</body>
+</html>
